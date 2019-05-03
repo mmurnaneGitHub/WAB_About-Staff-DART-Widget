@@ -1,9 +1,7 @@
 # WAB_About-Staff-DART-Widget
-Staff DART Map About Widget
+Staff DART Map About Widget - Customization adds links for Google Maps and gMap.
 
 Version 2.12
-
-Customization adds links for Google Maps and gMap.
 
 INSTRUCTIONS:
 

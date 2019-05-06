@@ -19,12 +19,17 @@ define(['dojo/_base/declare',
     'dojo/query',
     'dojo/on',
     'dojo/_base/lang',
+    'dojo/dom-construct',  //MJM - For map links - https://dojotoolkit.org/reference-guide/1.10/dojo/dom-construct.html	
+    'esri/tasks/GeometryService', //MJM - projection	
+    'esri/SpatialReference', //MJM - projection
     './common',
     'dijit/_WidgetsInTemplateMixin',
     'jimu/utils',
     'jimu/BaseWidget'
   ],
-  function(declare, html, query, on, lang, common, _WidgetsInTemplateMixin, jimuUtils, BaseWidget) {
+  function(declare, html, query, on, lang, 
+            domConstruct, GeometryService, SpatialReference,
+            common, _WidgetsInTemplateMixin, jimuUtils, BaseWidget) {
     var clazz = declare([BaseWidget, _WidgetsInTemplateMixin], {
       baseClass: 'jimu-widget-about',
 

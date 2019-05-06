@@ -35,6 +35,7 @@ define(['dojo/_base/declare',
 
       postCreate: function () {
         this.inherited(arguments);
+        gsvc = new GeometryService("https://gis.cityoftacoma.org/arcgis/rest/services/Utilities/Geometry/GeometryServer");  //MJM - Geometry Service - for reprojecting
       },
 
       startup: function () {
@@ -62,6 +63,10 @@ define(['dojo/_base/declare',
 
       resize: function () {
         this._resizeContentImg();
+      },
+      
+      _getGoogleMap: function() { //MJM
+          
       },
 
       onOpen: function(){

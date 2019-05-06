@@ -99,7 +99,12 @@ define(['dojo/_base/declare',
         var _activeElement = document.activeElement;
         html.empty(this.customContentNode);
 
-        var aboutContent = html.toDom(this.config.about.aboutContent);
+        //MJM - Add GovME Map | Google Map links
+        //var aboutContent = html.toDom(this.config.about.aboutContent);
+        var mapLinks = "<div style='text-align: center;'><span id='Map1'></span> | <span id='Map2'></span><br>&nbsp;</div>";	
+        var aboutContent = html.toDom(this.config.about.aboutContent + mapLinks);	
+        //end MJM
+        
         html.place(aboutContent, this.customContentNode);
         // single node only(no DocumentFragment)
         if (this.customContentNode.nodeType && this.customContentNode.nodeType === 1) {
@@ -131,6 +136,16 @@ define(['dojo/_base/declare',
             this.isOpen = false;
           }
         }
+
+          //MJM - Update click event for map links	
+          //Method to add click event  - Need lang.hitch to keep scope of function within widget	
+          //Google Map - Map1	
+          domConstruct.create("span", {innerHTML: "<span style='color: blue; text-decoration: underline; cursor: pointer;' title='Open Google Map @ current location'>Google Map</span>"}, dojo.byId("Map1"));	
+          on(dojo.byId("Map1"), 'click', lang.hitch(this, this._getGoogleMap));	
+          //govME Map - Map2	
+          domConstruct.create("span", {innerHTML: "<span style='color: blue; text-decoration: underline; cursor: pointer;' title='Open govME Map @ current location'>govME Map</span>"}, dojo.byId("Map2"));	
+          on(dojo.byId("Map2"), 'click', lang.hitch(this, this._getGovMeMap));	
+          //end MJM	
       },
       _resizeImg: function(img) {
         var customBox = html.getContentBox(this.customContentNode);

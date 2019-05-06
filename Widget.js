@@ -65,8 +65,25 @@ define(['dojo/_base/declare',
         this._resizeContentImg();
       },
       
-      _getGoogleMap: function() { //MJM
-          
+      _getGoogleMap: function() {  //MJM
+        var currentLatitude = this.map.extent.getCenter().getLatitude();
+        var currentLongitude = this.map.extent.getCenter().getLongitude();
+        var currentZoomLevel = this.map.getZoom();
+        //console.error(currentZoomLevel);
+        window.open('https://maps.google.com/?q=' + currentLatitude + ',' + currentLongitude + '&z=' + currentZoomLevel + '&layer=c&cbll=' + currentLatitude + ',' + currentLongitude + '&cbp=11,0,0,0,0');
+      },
+
+      _getGovMeMap: function() {  //MJM
+        var point = this.map.extent.getCenter();    //current map center point coordinates
+        var outSR = new SpatialReference(2286);
+ 
+        gsvc.project([ point ], outSR, function(projectedPoints) {
+          pt = projectedPoints[0];
+          //add a check here for non-IE browsers - gMap only works on IE
+          window.open('http://www.govme.org/gMap/MGMain.aspx?Type=Tidemark&X=' + pt.x.toFixed() + '&Y=' + pt.y.toFixed() + '&Width=500');
+        });
+       //IE 11 check
+        //console.error(/rv:11/i.test(navigator.userAgent));  //rv 11 for IE 11
       },
 
       onOpen: function(){

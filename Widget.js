@@ -28,8 +28,8 @@ define(['dojo/_base/declare',
     'jimu/BaseWidget'
   ],
   function(declare, html, query, on, lang, 
-            domConstruct, GeometryService, SpatialReference,
-            common, _WidgetsInTemplateMixin, jimuUtils, BaseWidget) {
+    domConstruct, GeometryService, SpatialReference,
+    common, _WidgetsInTemplateMixin, jimuUtils, BaseWidget) {
     var clazz = declare([BaseWidget, _WidgetsInTemplateMixin], {
       baseClass: 'jimu-widget-about',
 
@@ -44,10 +44,14 @@ define(['dojo/_base/declare',
           this.config.about.aboutContent = common.setDefaultContent(this.config, this.nls);
         }
         this.isOpen = true;
+
         this.openAtStartAysn = true;
         this.resize();
-        jimuUtils.focusFirstFocusByTheme(this, this.customContentNode);
-        this.openAtStartAysn = false;
+
+        this.openAtStartAysn = true;
+        if(jimuUtils.isAutoFocusFirstNodeWidget(this)){
+          this.customContentNode.focus();
+        }
 
         //Focus customContentNode
         //use firstTabNode for passing focus state to customContentNode (FF)
@@ -64,7 +68,7 @@ define(['dojo/_base/declare',
       resize: function () {
         this._resizeContentImg();
       },
-      
+
       _getGoogleMap: function() {  //MJM
         var currentLatitude = this.map.extent.getCenter().getLatitude();
         var currentLongitude = this.map.extent.getCenter().getLongitude();
@@ -104,7 +108,7 @@ define(['dojo/_base/declare',
         var mapLinks = "<div style='text-align: center;'><span id='Map1'></span> | <span id='Map2'></span><br>&nbsp;</div>";	
         var aboutContent = html.toDom(this.config.about.aboutContent + mapLinks);	
         //end MJM
-        
+
         html.place(aboutContent, this.customContentNode);
         // single node only(no DocumentFragment)
         if (this.customContentNode.nodeType && this.customContentNode.nodeType === 1) {
@@ -132,11 +136,12 @@ define(['dojo/_base/declare',
           //focus firstNode if required
           if(this.isOpen || html.isDescendant(_activeElement, this.domNode)){
             var firstNode = jimuUtils.getFirstFocusNode(this.domNode);
-            jimuUtils.focusFirstFocusByTheme(this, firstNode);
+            if(jimuUtils.isAutoFocusFirstNodeWidget(this)){
+              firstNode.focus();
+            }
             this.isOpen = false;
           }
         }
-
           //MJM - Update click event for map links	
           //Method to add click event  - Need lang.hitch to keep scope of function within widget	
           //Google Map - Map1	

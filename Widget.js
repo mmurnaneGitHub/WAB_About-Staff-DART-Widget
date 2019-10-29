@@ -15,19 +15,19 @@
 ///////////////////////////////////////////////////////////////////////////
 
 define(['dojo/_base/declare',
-    'dojo/_base/html',
-    'dojo/query',
-    'dojo/on',
-    'dojo/_base/lang',
-    'dojo/dom-construct',  //MJM - For map links - https://dojotoolkit.org/reference-guide/1.10/dojo/dom-construct.html	
-    'esri/tasks/GeometryService', //MJM - projection	
-    'esri/SpatialReference', //MJM - projection
-    './common',
-    'dijit/_WidgetsInTemplateMixin',
-    'jimu/utils',
-    'jimu/BaseWidget'
-  ],
-  function(declare, html, query, on, lang, 
+  'dojo/_base/html',
+  'dojo/query',
+  'dojo/on',
+  'dojo/_base/lang',
+  'dojo/dom-construct',  //MJM - For map links - https://dojotoolkit.org/reference-guide/1.10/dojo/dom-construct.html	
+  'esri/tasks/GeometryService', //MJM - projection	
+  'esri/SpatialReference', //MJM - SR for projection
+  './common',
+  'dijit/_WidgetsInTemplateMixin',
+  'jimu/utils',
+  'jimu/BaseWidget'
+],
+  function (declare, html, query, on, lang,
     domConstruct, GeometryService, SpatialReference,
     common, _WidgetsInTemplateMixin, jimuUtils, BaseWidget) {
     var clazz = declare([BaseWidget, _WidgetsInTemplateMixin], {
@@ -49,16 +49,16 @@ define(['dojo/_base/declare',
         this.resize();
 
         this.openAtStartAysn = true;
-        if(jimuUtils.isAutoFocusFirstNodeWidget(this)){
+        if (jimuUtils.isAutoFocusFirstNodeWidget(this)) {
           this.customContentNode.focus();
         }
 
         //Focus customContentNode
         //use firstTabNode for passing focus state to customContentNode (FF)
-        this.own(on(this.splashContainerNode, 'focus', lang.hitch(this, function(){
+        this.own(on(this.splashContainerNode, 'focus', lang.hitch(this, function () {
           this.firstTabNode.focus();
         })));
-        this.own(on(this.firstTabNode, 'focus', lang.hitch(this, function(){
+        this.own(on(this.firstTabNode, 'focus', lang.hitch(this, function () {
           this.customContentNode.focus();
         })));
 
@@ -69,31 +69,26 @@ define(['dojo/_base/declare',
         this._resizeContentImg();
       },
 
-      _getGoogleMap: function() {  //MJM
+      _getGoogleMap: function () {  //MJM
         var currentLatitude = this.map.extent.getCenter().getLatitude();
         var currentLongitude = this.map.extent.getCenter().getLongitude();
         var currentZoomLevel = this.map.getZoom();
-        //console.error(currentZoomLevel);
-        window.open('https://maps.google.com/?q=' + currentLatitude + ',' + currentLongitude + '&z=' + currentZoomLevel + '&layer=c&cbll=' + currentLatitude + ',' + currentLongitude + '&cbp=11,0,0,0,0');
+        window.open('https://www.google.com/maps/@?api=1&map_action=map&center=' + currentLatitude + ',' + currentLongitude + '&zoom=' + currentZoomLevel + '&basemap=satellite');  //https://developers.google.com/maps/documentation/urls/guide#map-action
       },
 
-      _getGovMeMap: function() {  //MJM
+      _getGovMeMap: function () {  //MJM
         var point = this.map.extent.getCenter();    //current map center point coordinates
         var outSR = new SpatialReference(2286);
- 
-        gsvc.project([ point ], outSR, function(projectedPoints) {
+        gsvc.project([point], outSR, function (projectedPoints) {
           pt = projectedPoints[0];
-          //add a check here for non-IE browsers - gMap only works on IE
-          window.open('http://www.govme.org/gMap/MGMain.aspx?Type=Tidemark&X=' + pt.x.toFixed() + '&Y=' + pt.y.toFixed() + '&Width=500');
+          window.open('http://www.govme.org/gMap/MGMain.aspx?Type=Tidemark&X=' + pt.x.toFixed() + '&Y=' + pt.y.toFixed() + '&Width=500');  //gMap only works on IE
         });
-       //IE 11 check
-        //console.error(/rv:11/i.test(navigator.userAgent));  //rv 11 for IE 11
       },
 
-      onOpen: function(){
+      onOpen: function () {
         this.isOpen = true;
         //resolve issue #15086 when network is so slow.
-        setTimeout(lang.hitch(this, function(){
+        setTimeout(lang.hitch(this, function () {
           this.isOpen = false;
         }), 50);
       },
@@ -104,9 +99,8 @@ define(['dojo/_base/declare',
         html.empty(this.customContentNode);
 
         //MJM - Add GovME Map | Google Map links
-        //var aboutContent = html.toDom(this.config.about.aboutContent);
-        var mapLinks = "<div style='text-align: center;'><span id='Map1'></span> | <span id='Map2'></span><br>&nbsp;</div>";	
-        var aboutContent = html.toDom(this.config.about.aboutContent + mapLinks);	
+        var mapLinks = "<div style='text-align: center;'><span id='Map1'></span> | <span id='Map2'></span><br>&nbsp;</div>";
+        var aboutContent = html.toDom(this.config.about.aboutContent + mapLinks);
         //end MJM
 
         html.place(aboutContent, this.customContentNode);
@@ -128,31 +122,30 @@ define(['dojo/_base/declare',
 
           //Init dom's attrs and events again because doms are new after resizing.
           var focusableNodes = jimuUtils.getFocusNodesInDom(this.domNode);
-          if(focusableNodes.length){
+          if (focusableNodes.length) {
             jimuUtils.initFirstFocusNode(this.domNode, focusableNodes[0]);
             jimuUtils.initLastFocusNode(this.domNode, focusableNodes[focusableNodes.length - 1]);
           }
 
           //focus firstNode if required
-          if(this.isOpen || html.isDescendant(_activeElement, this.domNode)){
+          if (this.isOpen || html.isDescendant(_activeElement, this.domNode)) {
             var firstNode = jimuUtils.getFirstFocusNode(this.domNode);
-            if(jimuUtils.isAutoFocusFirstNodeWidget(this)){
+            if (jimuUtils.isAutoFocusFirstNodeWidget(this)) {
               firstNode.focus();
             }
             this.isOpen = false;
           }
         }
-          //MJM - Update click event for map links	
-          //Method to add click event  - Need lang.hitch to keep scope of function within widget	
-          //Google Map - Map1	
-          domConstruct.create("span", {innerHTML: "<span style='color: blue; text-decoration: underline; cursor: pointer;' title='Open Google Map @ current location'>Google Map</span>"}, dojo.byId("Map1"));	
-          on(dojo.byId("Map1"), 'click', lang.hitch(this, this._getGoogleMap));	
-          //govME Map - Map2	
-          domConstruct.create("span", {innerHTML: "<span style='color: blue; text-decoration: underline; cursor: pointer;' title='Open govME Map @ current location'>govME Map</span>"}, dojo.byId("Map2"));	
-          on(dojo.byId("Map2"), 'click', lang.hitch(this, this._getGovMeMap));	
-          //end MJM	
+        //MJM - Update click event for map links | Method to add click event  - Need lang.hitch to keep scope of function within widget	
+        //Google Map - Map1	
+        domConstruct.create("span", { innerHTML: "<span style='color: blue; text-decoration: underline; cursor: pointer;' title='Open Google Map @ current location'>Google Map</span>" }, dojo.byId("Map1"));
+        on(dojo.byId("Map1"), 'click', lang.hitch(this, this._getGoogleMap));
+        //govME Map - Map2	
+        domConstruct.create("span", { innerHTML: "<span style='color: blue; text-decoration: underline; cursor: pointer;' title='Open govME Map @ current location'>govME Map</span>" }, dojo.byId("Map2"));
+        on(dojo.byId("Map2"), 'click', lang.hitch(this, this._getGovMeMap));
+        //end MJM	
       },
-      _resizeImg: function(img) {
+      _resizeImg: function (img) {
         var customBox = html.getContentBox(this.customContentNode);
         var imgSize = html.getContentBox(img);
         if (imgSize && imgSize.w && imgSize.w >= customBox.w) {
